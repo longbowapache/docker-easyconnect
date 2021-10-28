@@ -3,7 +3,7 @@ name: Build And Push Docker Image
 on: workflow_dispatch
 
 env:
-  IMAGE_NAME: hagb/docker-easyconnect
+  IMAGE_NAME: xxqqzztx/docker-easyconnect
 
 jobs:
   build:
@@ -23,17 +23,8 @@ jobs:
       - name: Build Docker image
         run: |
           docker-build() {
-            docker pull $1
-            docker build -t $1 --cache-from $1 --build-arg BUILD_ENV=actions "${@:2}"
+            docker build -t $1 --build-arg BUILD_ENV=actions "${@:2}"
           }
-
-          docker-build ${{ env.IMAGE_NAME }}:cli -f Dockerfile.cli .
-
-          docker-build ${{ env.IMAGE_NAME }}:7.6.3 --build-arg EC_URL=$(cat ec_urls/7.6.3.txt) -f Dockerfile .
-          docker-build ${{ env.IMAGE_NAME }}:7.6.7 --build-arg EC_URL=$(cat ec_urls/7.6.7.txt) -f Dockerfile .
-
-          docker-build ${{ env.IMAGE_NAME }}:vncless-7.6.3 --build-arg EC_URL=$(cat ec_urls/7.6.3.txt) -f Dockerfile.vncless .
-          docker-build ${{ env.IMAGE_NAME }}:vncless-7.6.7 --build-arg EC_URL=$(cat ec_urls/7.6.7.txt) -f Dockerfile.vncless .
 
           docker-build ${{ env.IMAGE_NAME }}:novnc-7.6.3 --build-arg EC_URL=$(cat ec_urls/7.6.3.txt) -f Dockerfile.novnc .
           docker-build ${{ env.IMAGE_NAME }}:novnc-7.6.7 --build-arg EC_URL=$(cat ec_urls/7.6.7.txt) -f Dockerfile.novnc .
