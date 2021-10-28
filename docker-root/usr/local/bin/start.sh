@@ -1,5 +1,5 @@
 #!/bin/bash
-
+BASE_CONF_DIR=/root
 [ -n "$CHECK_SYSTEM_ONLY" ] && detect-tun.sh
 detect-iptables.sh
 . "$(which detect-route.sh)"
@@ -49,10 +49,10 @@ fi
 
 # 登录信息持久化处理
 ## 持久化配置文件夹 感谢 @hexid26 https://github.com/Hagb/docker-easyconnect/issues/21
-[ -d ~/conf ] || cp -a /usr/share/sangfor/EasyConnect/resources/conf_backup ~/conf
-[ -e ~/easy_connect.json ] && mv ~/easy_connect.json ~/conf/easy_connect.json # 向下兼容
+[ -d ${BASE_CONF_DIR}/conf ] || cp -a /usr/share/sangfor/EasyConnect/resources/conf_backup ${BASE_CONF_DIR}/conf
+[ -e ${BASE_CONF_DIR}/easy_connect.json ] && mv ${BASE_CONF_DIR}/easy_connect.json ${BASE_CONF_DIR}/conf/easy_connect.json # 向下兼容
 ## 默认使用英语：感谢 @forest0 https://github.com/Hagb/docker-easyconnect/issues/2#issuecomment-658205504
-[ -e ~/conf/easy_connect.json ] || echo '{"language": "en_US"}' > ~/conf/easy_connect.json
+[ -e ${BASE_CONF_DIR}/conf/easy_connect.json ] || echo '{"language": "en_US"}' > ${BASE_CONF_DIR}/conf/easy_connect.json
 
 export DISPLAY
 
@@ -64,11 +64,11 @@ then
 	mkdir /tmp
 
 	# $PASSWORD 不为空时，更新 vnc 密码
-	[ -e ~/.vnc/passwd ] || (mkdir -p ~/.vnc && (echo password | tigervncpasswd -f > ~/.vnc/passwd)) 
-	[ -n "$PASSWORD" ] && printf %s "$PASSWORD" | tigervncpasswd -f > ~/.vnc/passwd
+	[ -e ${BASE_CONF_DIR}/.vnc/passwd ] || (mkdir -p ${BASE_CONF_DIR}/.vnc && (echo password | tigervncpasswd -f > ${BASE_CONF_DIR}/.vnc/passwd))
+	[ -n "$PASSWORD" ] && printf %s "$PASSWORD" | tigervncpasswd -f > ${BASE_CONF_DIR}/.vnc/passwd
 
 	open_port 5901
-	tigervncserver :1 -geometry 800x600 -localhost no -passwd ~/.vnc/passwd -xstartup flwm
+	tigervncserver :1 -geometry 800x600 -localhost no -passwd ${BASE_CONF_DIR}/.vnc/passwd -xstartup flwm
 	DISPLAY=:1
 
 	# 将 easyconnect 的密码放入粘贴板中，应对密码复杂且无法保存的情况 (eg: 需要短信验证登录)
