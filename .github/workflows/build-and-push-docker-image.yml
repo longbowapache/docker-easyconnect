@@ -35,6 +35,9 @@ jobs:
           docker-build ${{ env.IMAGE_NAME }}:vncless-7.6.3 --build-arg EC_URL=$(cat ec_urls/7.6.3.txt) -f Dockerfile.vncless .
           docker-build ${{ env.IMAGE_NAME }}:vncless-7.6.7 --build-arg EC_URL=$(cat ec_urls/7.6.7.txt) -f Dockerfile.vncless .
 
+          docker-build ${{ env.IMAGE_NAME }}:novnc-7.6.3 --build-arg EC_URL=$(cat ec_urls/7.6.3.txt) -f Dockerfile.novnc .
+          docker-build ${{ env.IMAGE_NAME }}:novnc-7.6.7 --build-arg EC_URL=$(cat ec_urls/7.6.7.txt) -f Dockerfile.novnc .
+
       - name: Push Docker image
         run: |
           docker tag ${{ env.IMAGE_NAME }}:7.6.3 ${{ env.IMAGE_NAME }}:latest
