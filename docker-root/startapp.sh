@@ -1,3 +1,3 @@
-#!/bin/sh
+#!/bin/bash
 
-TYPE=x11 start.sh
+TYPE=x11 bash start.sh
