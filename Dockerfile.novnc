@@ -1,4 +1,4 @@
-FROM jlesage/baseimage-gui:debian-10
+FROM ghcr.io/linuxserver/baseimage-rdesktop-web:0.1.2
 
 ARG BUILD_ENV=local
 
