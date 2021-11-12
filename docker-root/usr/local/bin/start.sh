@@ -1,5 +1,5 @@
 #!/bin/bash
-BASE_CONF_DIR=/root
+BASE_CONF_DIR=/config
 [ -n "$CHECK_SYSTEM_ONLY" ] && detect-tun.sh
 detect-iptables.sh
 . "$(which detect-route.sh)"
