@@ -12,7 +12,7 @@ sleep 5
 [ -d /sys/class/net/tun0 ] && {
 	chmod a+w /tmp
 	open_port 1080
-	su daemon -s /usr/sbin/danted
+	su abc -s /usr/sbin/danted
 	close_port 1080
 }
 done
