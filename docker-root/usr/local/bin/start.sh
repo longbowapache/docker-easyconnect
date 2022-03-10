@@ -5,20 +5,14 @@ detect-iptables.sh
 . "$(which detect-route.sh)"
 [ -n "$CHECK_SYSTEM_ONLY" ] && exit
 
-cp /etc/danted.conf.sample /run/danted.conf
-externals=""
-for iface in $({ ip -f inet -o addr; ip -f inet6 -o addr; } | sed -E 's/^[0-9]+: ([^ ]+) .*/\1/'); do
-	externals="${externals}external: $iface\\n"
-done
-sed s/^#external-lines/"$externals"/ -i /run/danted.conf
-# 在虚拟网络设备 tun0 打开时运行 danted 代理服务器
+# 在虚拟网络设备 tun0 打开时运行 proxy 代理服务器
 [ -n "$NODANTED" ] || (while true
 do
 sleep 5
 [ -d /sys/class/net/tun0 ] && {
 	chmod a+w /tmp
 	open_port 1080
-	su daemon -s /usr/sbin/danted -f /run/danted.conf
+	su daemon -s /usr/sbin/danted
 	close_port 1080
 }
 done
@@ -26,15 +20,25 @@ done
 open_port 8888
 tinyproxy -c /etc/tinyproxy.conf
 
+interface_name="eth0"
+
+# 如果是 podman 容器，interface 名称为 tap0 而不是 eth0
+if [[ -n "$container" && "$container" == "podman" ]]; then
+	sed --in-place=.bak 's/eth0/tap0/g' /etc/danted.conf
+	interface_name="tap0"
+fi
+
 iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
 
 # 拒绝 tun0 侧主动请求的连接.
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -A INPUT -i tun0 -p tcp -j DROP
+iptables -I INPUT -p tcp -j DROP
+iptables -I INPUT -i $interface_name -p tcp -j ACCEPT
+iptables -I INPUT -i lo -p tcp -j ACCEPT
+iptables -I INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
 # 删除深信服可能生成的一条 iptables 规则，防止其丢弃传出到宿主机的连接
 # 感谢 @stingshen https://github.com/Hagb/docker-easyconnect/issues/6
-# ( while true; do sleep 5 ; iptables -D SANGFOR_VIRTUAL -j DROP 2>/dev/null ; done )&
+( while true; do sleep 5 ; iptables -D SANGFOR_VIRTUAL -j DROP 2>/dev/null ; done )&
 
 if [ -n "$_EC_CLI" ]; then
 	ln -s /usr/share/sangfor/EasyConnect/resources/{conf_${EC_VER},conf}

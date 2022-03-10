@@ -1,6 +1,4 @@
 #!/bin/bash
-fake-hwaddr-run() { "$@" ; }
-[ -n "$FAKE_HWADDR" ] && fake-hwaddr-run() { LD_PRELOAD=/usr/local/lib/fake-hwaddr.so "$@" ; }
 [ -z "$_EC_CLI" ] && /usr/share/sangfor/EasyConnect/resources/bin/EasyMonitor
 sleep 1
 while true
@@ -10,16 +8,16 @@ do
 		# 参考了 https://blog.51cto.com/13226459/2476193 ，在此对作者表示感谢。
 		{
 			tail -n 0 -f /usr/share/sangfor/EasyConnect/resources/logs/ECAgent.log | grep "\\[Register\\]cms client connect failed" -m 1
-			fake-hwaddr-run /usr/share/sangfor/EasyConnect/resources/shell/sslservice.sh
+			/usr/share/sangfor/EasyConnect/resources/shell/sslservice.sh
 		} &
 
 		# 下面这行代码启动 EasyConnect 的前端。
-		fake-hwaddr-run /usr/share/sangfor/EasyConnect/EasyConnect --enable-transparent-visuals --disable-gpu
+		/usr/share/sangfor/EasyConnect/EasyConnect --enable-transparent-visuals --disable-gpu
 	else
-		fake-hwaddr-run /usr/share/sangfor/EasyConnect/resources/bin/ECAgent &
+		/usr/share/sangfor/EasyConnect/resources/bin/ECAgent &
 		sleep 1
-		fake-hwaddr-run easyconn login -t autologin
-		pidof svpnservice > /dev/null || fake-hwaddr-run bash -c "exec easyconn login $CLI_OPTS"
+		easyconn login -t autologin
+		pidof svpnservice > /dev/null || bash -c "exec easyconn login $CLI_OPTS"
 		# # 重启一下 tinyproxy
 		# service tinyproxy restart
 		while pidof svpnservice > /dev/null ; do
