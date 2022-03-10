@@ -25,24 +25,9 @@ jobs:
           docker-build() {
             docker build -t $1 --build-arg BUILD_ENV=actions "${@:2}"
           }
-          pirefix=""
-          latest_name="latest"
-          if [ "$(git branch --show-current)" = develop ]; then prefix=dev- ; latest_name=dev ; fi
 
           docker-build ${{ env.IMAGE_NAME }}:novnc-7.6.3 --build-arg EC_URL=$(cat ec_urls/7.6.3.txt) -f Dockerfile.novnc .
           docker-build ${{ env.IMAGE_NAME }}:novnc-7.6.7 --build-arg EC_URL=$(cat ec_urls/7.6.7.txt) -f Dockerfile.novnc .
-
-          docker-build fake-hwaddr -f Dockerfile.fake-hwaddr .
-
-          docker-build ${{ env.IMAGE_NAME }}:${prefix}cli -f Dockerfile.cli .
-
-          docker-build ${{ env.IMAGE_NAME }}:${prefix}7.6.3 --build-arg EC_URL=$(cat ec_urls/7.6.3.txt) -f Dockerfile .
-          docker-build ${{ env.IMAGE_NAME }}:${prefix}7.6.7 --build-arg EC_URL=$(cat ec_urls/7.6.7.txt) -f Dockerfile .
-
-          docker-build ${{ env.IMAGE_NAME }}:${prefix}vncless-7.6.3 --build-arg EC_URL=$(cat ec_urls/7.6.3.txt) -f Dockerfile.vncless .
-          docker-build ${{ env.IMAGE_NAME }}:${prefix}vncless-7.6.7 --build-arg EC_URL=$(cat ec_urls/7.6.7.txt) -f Dockerfile.vncless .
-
-          docker tag ${{ env.IMAGE_NAME }}:${prefix}7.6.3 ${{ env.IMAGE_NAME }}:${latest_name}
 
       - name: Push Docker image
         run: |
